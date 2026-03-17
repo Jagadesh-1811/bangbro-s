@@ -185,17 +185,7 @@ CREATE TABLE recruiter_bookings (
 
 ---
 
-##  Deployment
-
-
-  **Verify Deployment**
-   ```bash
-   # Your app will be available at:
-   https://your-project.vercel.app
-   ```
-
-
-## 👥 Team
+## Team
 
 Meet the talented developers behind Bang Bros:
 
@@ -215,15 +205,15 @@ Meet the talented developers behind Bang Bros:
 - **CORS Protection**: Whitelist origin domains
 -**Environment Secrets**: Sensitive data in `.env` (not in repo)
 - **Input Validation**: Email/password requirement checks
-- **SQL Injection Prevention**: Parameterized Supabase queries
-
----
-
 
 
 ---
 
-## 📈 Future Roadmap
+
+
+---
+
+##  Future Roadmap
 
 -  Email notifications on interview scheduling
 -  Video interview integration (Zoom/Google Meet API)
@@ -236,11 +226,7 @@ Meet the talented developers behind Bang Bros:
 
 ---
 
-## 📝 License
 
-This project is licensed under the MIT License - see LICENSE file for details.
-
----
 
 
 
