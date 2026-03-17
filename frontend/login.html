@@ -154,7 +154,8 @@
     </div>
     <script>
         // Backend URL configuration
-        const API_URL = 'https://bangbro-s-ahky.vercel.app';
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_URL = isLocal ? 'http://localhost:5000' : 'https://bangbro-s-ahky.vercel.app';
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             this.action = API_URL + '/login';

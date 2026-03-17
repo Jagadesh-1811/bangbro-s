@@ -513,7 +513,9 @@
 
     <script>
         // Backend URL configuration
-        const API_URL = 'https://bangbro-s-ahky.vercel.app';
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_URL = isLocal ? 'http://localhost:5000' : 'https://bangbro-s-ahky.vercel.app';
+        const FRONTEND_URL = isLocal ? 'http://localhost:8000' : 'https://bangbro-s.vercel.app';
 
         // Fetch user data on page load
         async function loadUserProfile() {
@@ -562,10 +564,10 @@
                     method: 'POST',
                     credentials: 'include'
                 }).then(() => {
-                    window.location.href = 'https://bangbro-s.vercel.app/';
+                    window.location.href = FRONTEND_URL + '/';
                 }).catch(error => {
                     console.error('Logout error:', error);
-                    window.location.href = 'https://bangbro-s.vercel.app/';
+                    window.location.href = FRONTEND_URL + '/';
                 });
             }
         }

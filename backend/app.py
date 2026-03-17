@@ -4,44 +4,24 @@ from supabase import create_client, Client
 import os
 import requests
 from dotenv import load_dotenv
-from werkzeug.security import generate_password_hash, check_password_hash
-import traceback
+import bcrypt
 import json
 
-
-def find_frontend_path():
-    possible_paths = [
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '../frontend'),
-        os.path.join(os.getcwd(), 'frontend'),
-        'frontend',
-        '/var/task/frontend'
-    ]
-    for path in possible_paths:
-        if os.path.exists(path) and os.path.exists(os.path.join(path, 'submitbooking.html')):
-            return path
-    return '../frontend'
-
-FRONTEND_PATH = find_frontend_path()
-
+# Load environment variables from .env file
 load_dotenv()
 
-
 app = Flask(__name__, 
-            template_folder=FRONTEND_PATH, 
-            static_folder=FRONTEND_PATH)
+            template_folder='../frontend', 
+            static_folder='../frontend')
 
 # Configure session
-app.config['PROPAGATE_EXCEPTIONS'] = True
 app.secret_key = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# Enable CORS for frontend (production only)
-app.config['PROPAGATE_EXCEPTIONS'] = True
-app.config['DEBUG'] = True 
-
+# Enable CORS for frontend on port 8000
 CORS(app, 
-     resources={r"/*": {"origins": ["https://bangbro-s-ahky.vercel.app", "https://bangbro-s.vercel.app"]}},
+     resources={r"/*": {"origins": ["http://localhost:8000", "http://127.0.0.1:8000"]}},
      supports_credentials=True)
 
 # Supabase Credentials from environment variables
@@ -56,52 +36,7 @@ else:
     GOOGLE_SCRIPT_URL = GOOGLE_SCRIPT_ID or "YOUR_GOOGLE_WEB_APP_URL_HERE"
 
 # Initialize Supabase client
-supabase = None
-try:
-    if SUPABASE_URL and SUPABASE_KEY:
-        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-        print("✓ Supabase client initialized")
-    else:
-        print("⚠ Missing SUPABASE_URL or SUPABASE_KEY environment variables")
-except Exception as e:
-    print(f"✗ Failed to initialize Supabase: {str(e)}")
-
-@app.errorhandler(Exception)
-def handle_exception(e):
-    # This catches ALL unhandled exceptions
-    tb = traceback.format_exc()
-    return f"""
-    <h1>UNHANDLED EXCEPTION</h1>
-    <pre>{tb}</pre>
-    <a href="https://bangbro-s.vercel.app/">Go Back</a>
-    """, 500
-
-@app.route('/api/test')
-def test_backend():
-    files_in_root = []
-    try:
-        files_in_root = os.listdir('.')
-    except:
-        pass
-        
-    parent_files = []
-    try:
-        parent_files = os.listdir('..')
-    except:
-        pass
-
-    return jsonify({
-        "status": "online",
-        "working_dir": os.getcwd(),
-        "chosen_frontend_path": FRONTEND_PATH,
-        "files_in_working_dir": files_in_root,
-        "files_in_parent": parent_files,
-        "supabase_initialized": supabase is not None,
-        "env_vars": {
-            "SUPABASE_URL": "Set" if os.getenv("SUPABASE_URL") else "Missing",
-            "SUPABASE_KEY": "Set" if os.getenv("SUPABASE_KEY") else "Missing"
-        }
-    })
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @app.route('/')
 def home():
@@ -116,8 +51,6 @@ def home():
 
 @app.route('/submitbooking', methods=['POST'])
 def submit_booking():
-    if not supabase:
-        return "<h1>Error</h1><p>Database connection not initialized.</p>", 500
     try:
         # Get form data
         company = request.form.get('company')
@@ -166,18 +99,16 @@ def submit_booking():
             except Exception as google_error:
                 print(f"⚠ Google Sheets sync failed: {str(google_error)}")
         
-        return f"<h1>Success!</h1><p>Meeting for {applicant_name}  saved.</p><a href='https://bangbro-s.vercel.app/'>Go Back</a>"
+        return f"<h1>Success!</h1><p>Meeting for {applicant_name}  saved.</p><a href='http://localhost:8000/'>Go Back</a>"
         
     except Exception as e:
         error_msg = str(e)
         print(f"✗ Error: {error_msg}")
-        return f"<h1>Error</h1><p>{error_msg}</p><a href='https://bangbro-s.vercel.app/'>Go Back</a>", 400
+        return f"<h1>Error</h1><p>{error_msg}</p><a href='http://localhost:8000/'>Go Back</a>", 400
 
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    if not supabase:
-        return "<h1>Error</h1><p>Database connection not initialized.</p>", 500
     """User signup endpoint - stores user credentials in database"""
     try:
         # Get form data
@@ -187,18 +118,18 @@ def signup():
         
         # Validate input
         if not email or not password or not name:
-            return "<h1>Error</h1><p>Name, email and password are required.</p><a href='https://bangbro-s.vercel.app/signup.html'>Go Back</a>", 400
+            return "<h1>Error</h1><p>Name, email and password are required.</p><a href='http://localhost:8000/signup.html'>Go Back</a>", 400
         
         # Check if user already exists
         try:
             existing_user = supabase.table("users").select("*").eq("email", email).execute()
             if existing_user.data:
-                return "<h1>Error</h1><p>User with this email already exists.</p><a href='https://bangbro-s.vercel.app/signup.html'>Go Back</a>", 400
+                return "<h1>Error</h1><p>User with this email already exists.</p><a href='http://localhost:8000/signup.html'>Go Back</a>", 400
         except Exception as check_error:
             print(f"⚠ Error checking existing user: {str(check_error)}")
         
-        # Hash the password using werkzeug.security
-        password_hash = generate_password_hash(password)
+        # Hash the password using bcrypt
+        password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         
         # Prepare user data - only email and password_hash (as per database schema)
         user_data = {
@@ -213,18 +144,16 @@ def signup():
         # Store name in session for later use (avatar generation)
         session['signup_name'] = name
         
-        return "<h1>Success!</h1><p>Account created successfully! You can now <a href='https://bangbro-s.vercel.app/login.html'>login</a>.</p>", 200
+        return "<h1>Success!</h1><p>Account created successfully! You can now <a href='http://localhost:8000/login.html'>login</a>.</p>", 200
         
     except Exception as e:
         error_msg = str(e)
         print(f"✗ Signup Error: {error_msg}")
-        return f"<h1>Error</h1><p>Signup failed: {error_msg}</p><a href='https://bangbro-s.vercel.app/signup.html'>Go Back</a>", 400
+        return f"<h1>Error</h1><p>Signup failed: {error_msg}</p><a href='http://localhost:8000/signup.html'>Go Back</a>", 400
 
 
 @app.route('/login', methods=['POST'])
 def login():
-    if not supabase:
-        return "<h1>Error</h1><p>Database connection not initialized.</p>", 500
     """User login endpoint - authenticates user credentials and stores in session"""
     try:
         # Get form data
@@ -233,19 +162,19 @@ def login():
         
         # Validate input
         if not email or not password:
-            return "<h1>Error</h1><p>Email and password are required.</p><a href='https://bangbro-s.vercel.app/login.html'>Go Back</a>", 400
+            return "<h1>Error</h1><p>Email and password are required.</p><a href='http://localhost:8000/login.html'>Go Back</a>", 400
         
         # Query user from database
         result = supabase.table("users").select("*").eq("email", email).execute()
         
         if not result.data:
-            return "<h1>Error</h1><p>Invalid email or password.</p><a href='https://bangbro-s.vercel.app/login.html'>Go Back</a>", 401
+            return "<h1>Error</h1><p>Invalid email or password.</p><a href='http://localhost:8000/login.html'>Go Back</a>", 401
         
         user = result.data[0]
         stored_hash = user['password_hash']
         
-        # Verify password using werkzeug.security
-        if check_password_hash(stored_hash, password):
+        # Verify password
+        if bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
             # Generate name from email or use stored name if available
             email_name = email.split('@')[0].replace('.', ' ').title()
             user_name = email_name
@@ -262,15 +191,15 @@ def login():
             session['user_avatar'] = avatar_url
             
             print(f"✓ User {email} logged in successfully")
-            return redirect('https://bangbro-s.vercel.app/')
+            return redirect('http://localhost:8000/')
         else:
             print(f"✗ Failed login attempt for {email}")
-            return "<h1>Error</h1><p>Invalid email or password.</p><a href='https://bangbro-s.vercel.app/login.html'>Go Back</a>", 401
+            return "<h1>Error</h1><p>Invalid email or password.</p><a href='http://localhost:8000/login.html'>Go Back</a>", 401
             
     except Exception as e:
         error_msg = str(e)
         print(f"✗ Login Error: {error_msg}")
-        return f"<h1>Error</h1><p>Login failed: {error_msg}</p><a href='https://bangbro-s.vercel.app/login.html'>Go Back</a>", 400
+        return f"<h1>Error</h1><p>Login failed: {error_msg}</p><a href='http://localhost:8000/login.html'>Go Back</a>", 400
 
 
 @app.route('/api/user', methods=['GET'])
@@ -300,7 +229,7 @@ def logout():
     """User logout endpoint - clears session"""
     session.clear()
     print("✓ User logged out")
-    return redirect('https://bangbro-s.vercel.app/')
+    return redirect('http://localhost:8000/')
 
 
 if __name__ == '__main__':
