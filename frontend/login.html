@@ -155,7 +155,7 @@
     <script>
         // Backend URL configuration
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_URL = isLocal ? 'http://localhost:5000' : 'https://bangbro-s-ahky.vercel.app';
+        const API_URL = isLocal ? 'http://localhost:5000' : 'https://bangbro-s.vercel.app/';
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             this.action = API_URL + '/login';
