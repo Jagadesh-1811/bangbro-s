@@ -11,6 +11,7 @@ import json
 # Load environment variables from .env file
 load_dotenv()
 
+# Standard относительные пути для Vercel
 app = Flask(__name__, 
             template_folder='../frontend', 
             static_folder='../frontend')
@@ -21,6 +22,9 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # Enable CORS for frontend (production only)
+app.config['PROPAGATE_EXCEPTIONS'] = True
+app.config['DEBUG'] = True # Force debug info in production for this phase
+
 CORS(app, 
      resources={r"/*": {"origins": ["https://bangbro-s-ahky.vercel.app", "https://bangbro-s.vercel.app"]}},
      supports_credentials=True)
@@ -47,22 +51,40 @@ try:
 except Exception as e:
     print(f"✗ Failed to initialize Supabase: {str(e)}")
 
-@app.errorhandler(500)
-def handle_500(e):
-    # This is for debugging purposes on Vercel
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # This catches ALL unhandled exceptions
     tb = traceback.format_exc()
     return f"""
-    <h1>500 Internal Server Error</h1>
+    <h1>UNHANDLED EXCEPTION</h1>
     <pre>{tb}</pre>
     <a href="https://bangbro-s.vercel.app/">Go Back</a>
     """, 500
 
 @app.route('/api/test')
 def test_backend():
+    files_in_root = []
+    try:
+        files_in_root = os.listdir('.')
+    except:
+        pass
+        
+    parent_files = []
+    try:
+        parent_files = os.listdir('..')
+    except:
+        pass
+
     return jsonify({
         "status": "online",
+        "working_dir": os.getcwd(),
+        "files_in_working_dir": files_in_root,
+        "files_in_parent": parent_files,
         "supabase_initialized": supabase is not None,
-        "environment": os.getenv("VERCEL_ENV", "local")
+        "env_vars": {
+            "SUPABASE_URL": "Set" if os.getenv("SUPABASE_URL") else "Missing",
+            "SUPABASE_KEY": "Set" if os.getenv("SUPABASE_KEY") else "Missing"
+        }
     })
 
 @app.route('/')
