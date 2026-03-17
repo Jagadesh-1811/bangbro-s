@@ -8,22 +8,37 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import traceback
 import json
 
-# Load environment variables from .env file
+
+def find_frontend_path():
+    possible_paths = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), '../frontend'),
+        os.path.join(os.getcwd(), 'frontend'),
+        'frontend',
+        '/var/task/frontend'
+    ]
+    for path in possible_paths:
+        if os.path.exists(path) and os.path.exists(os.path.join(path, 'submitbooking.html')):
+            return path
+    return '../frontend'
+
+FRONTEND_PATH = find_frontend_path()
+
 load_dotenv()
 
-# Standard относительные пути для Vercel
+
 app = Flask(__name__, 
-            template_folder='../frontend', 
-            static_folder='../frontend')
+            template_folder=FRONTEND_PATH, 
+            static_folder=FRONTEND_PATH)
 
 # Configure session
+app.config['PROPAGATE_EXCEPTIONS'] = True
 app.secret_key = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # Enable CORS for frontend (production only)
 app.config['PROPAGATE_EXCEPTIONS'] = True
-app.config['DEBUG'] = True # Force debug info in production for this phase
+app.config['DEBUG'] = True 
 
 CORS(app, 
      resources={r"/*": {"origins": ["https://bangbro-s-ahky.vercel.app", "https://bangbro-s.vercel.app"]}},
@@ -78,6 +93,7 @@ def test_backend():
     return jsonify({
         "status": "online",
         "working_dir": os.getcwd(),
+        "chosen_frontend_path": FRONTEND_PATH,
         "files_in_working_dir": files_in_root,
         "files_in_parent": parent_files,
         "supabase_initialized": supabase is not None,
