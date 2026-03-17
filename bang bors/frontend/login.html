@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup</title>
+    <title>Login</title>
     <style>
         * {
             margin: 0;
@@ -23,7 +23,7 @@
 
         }
 
-        #signup {
+        #login {
             background: #e4eef0;
             border: 2px solid #000000;
             border-radius: 15px;
@@ -108,20 +108,20 @@
             transition: all 1s ease;
         }
 
-        .login-link {
+        .signup-link {
             margin-top: 20px;
             font-size: 14px;
             color: #373737;
         }
 
-        .login-link a {
+        .signup-link a {
             color: #000000;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
-        .login-link a:hover {
+        .signup-link a:hover {
             color: #8cb4ff;
             text-decoration: underline;
         }
@@ -130,15 +130,12 @@
 </head>
 
 <body>
-    <div id="signup">
+    <div id="login">
         <h1 class="main">BANG BRO'S</h1><br><br>
-        <h1>SIGNUP</h1><br><br>
+        <h1>LOGIN</h1><br><br>
         <div class="container"></div>
-        <form id="signupForm" action="https://bangbro-s-ahky.vercel.app/signup" method="post">
+        <form id="loginForm" action="https://bangbro-s-1crh.vercel.app/login" method="post">
             <div style="text-align: left; max-width: 320px; margin: 0 auto;">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" name="name" placeholder="Enter your full name" required>
-                
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" placeholder="Enter your email" required>
                 
@@ -146,21 +143,22 @@
                 <input type="password" id="password" name="password" placeholder="Enter your password" required>
                 
                 <div style="text-align: center; margin-top: 10px;">
-                    <button type="submit" style="width: 100%; padding: 15px; font-size: 18px; border-radius: 50px;">Signup</button>
+                    <button type="submit" style="width: 100%; padding: 15px; font-size: 18px; border-radius: 50px;">Login</button>
                 </div>
             </div>
         </form>
-        <div class="login-link">
-            Already have an account? <a href="login.html">Go to Login</a>
+        <div class="signup-link">
+            Don't have an account? <a href="signup.html">Go to Signup</a>
         </div>
+    </div>
     </div>
     <script>
         // Backend URL configuration
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_URL = isLocal ? 'http://localhost:5000' : 'https://bangbro-s-ahky.vercel.app';
+        const API_URL = isLocal ? 'http://localhost:5000' : 'https://bangbro-s-1crh.vercel.app';
 
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
-            this.action = API_URL + '/signup';
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            this.action = API_URL + '/login';
         });
     </script>
 </body>

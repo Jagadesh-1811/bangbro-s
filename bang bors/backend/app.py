@@ -14,14 +14,12 @@ app = Flask(__name__,
             template_folder='../frontend', 
             static_folder='../frontend')
 
-# Configure session
-app.secret_key = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-
-# Enable CORS for frontend on port 8000
+# Determine environments
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000","https://bangbro-s.vercel.app")    
+    
+# Enable CORS for frontend
 CORS(app, 
-     resources={r"/*": {"origins": ["http://localhost:8000", "http://127.0.0.1:8000"]}},
+     resources={r"/*": {"origins": ["http://localhost:8000", "http://127.0.0.1:8000", "https://bangbro-s.vercel.app"]}},
      supports_credentials=True)
 
 # Supabase Credentials from environment variables
@@ -99,12 +97,12 @@ def submit_booking():
             except Exception as google_error:
                 print(f"⚠ Google Sheets sync failed: {str(google_error)}")
         
-        return f"<h1>Success!</h1><p>Meeting for {applicant_name}  saved.</p><a href='http://localhost:8000/'>Go Back</a>"
+        return f"<h1>Success!</h1><p>Meeting for {applicant_name}  saved.</p><a href='{FRONTEND_URL}/'>Go Back</a>"
         
     except Exception as e:
         error_msg = str(e)
         print(f"✗ Error: {error_msg}")
-        return f"<h1>Error</h1><p>{error_msg}</p><a href='http://localhost:8000/'>Go Back</a>", 400
+        return f"<h1>Error</h1><p>{error_msg}</p><a href='{FRONTEND_URL}/'>Go Back</a>", 400
 
 
 @app.route('/signup', methods=['POST'])
@@ -118,13 +116,13 @@ def signup():
         
         # Validate input
         if not email or not password or not name:
-            return "<h1>Error</h1><p>Name, email and password are required.</p><a href='http://localhost:8000/signup.html'>Go Back</a>", 400
+            return f"<h1>Error</h1><p>Name, email and password are required.</p><a href='{FRONTEND_URL}/signup.html'>Go Back</a>", 400
         
         # Check if user already exists
         try:
             existing_user = supabase.table("users").select("*").eq("email", email).execute()
             if existing_user.data:
-                return "<h1>Error</h1><p>User with this email already exists.</p><a href='http://localhost:8000/signup.html'>Go Back</a>", 400
+                return f"<h1>Error</h1><p>User with this email already exists.</p><a href='{FRONTEND_URL}/signup.html'>Go Back</a>", 400
         except Exception as check_error:
             print(f"⚠ Error checking existing user: {str(check_error)}")
         
@@ -144,12 +142,12 @@ def signup():
         # Store name in session for later use (avatar generation)
         session['signup_name'] = name
         
-        return "<h1>Success!</h1><p>Account created successfully! You can now <a href='http://localhost:8000/login.html'>login</a>.</p>", 200
+        return f"<h1>Success!</h1><p>Account created successfully! You can now <a href='{FRONTEND_URL}/login.html'>login</a>.</p>", 200
         
     except Exception as e:
         error_msg = str(e)
         print(f"✗ Signup Error: {error_msg}")
-        return f"<h1>Error</h1><p>Signup failed: {error_msg}</p><a href='http://localhost:8000/signup.html'>Go Back</a>", 400
+        return f"<h1>Error</h1><p>Signup failed: {error_msg}</p><a href='{FRONTEND_URL}/signup.html'>Go Back</a>", 400
 
 
 @app.route('/login', methods=['POST'])
@@ -162,13 +160,13 @@ def login():
         
         # Validate input
         if not email or not password:
-            return "<h1>Error</h1><p>Email and password are required.</p><a href='http://localhost:8000/login.html'>Go Back</a>", 400
+            return f"<h1>Error</h1><p>Email and password are required.</p><a href='{FRONTEND_URL}/login.html'>Go Back</a>", 400
         
         # Query user from database
         result = supabase.table("users").select("*").eq("email", email).execute()
         
         if not result.data:
-            return "<h1>Error</h1><p>Invalid email or password.</p><a href='http://localhost:8000/login.html'>Go Back</a>", 401
+            return f"<h1>Error</h1><p>Invalid email or password.</p><a href='{FRONTEND_URL}/login.html'>Go Back</a>", 401
         
         user = result.data[0]
         stored_hash = user['password_hash']
@@ -191,15 +189,15 @@ def login():
             session['user_avatar'] = avatar_url
             
             print(f"✓ User {email} logged in successfully")
-            return redirect('http://localhost:8000/')
+            return redirect(f'{FRONTEND_URL}/')
         else:
             print(f"✗ Failed login attempt for {email}")
-            return "<h1>Error</h1><p>Invalid email or password.</p><a href='http://localhost:8000/login.html'>Go Back</a>", 401
+            return f"<h1>Error</h1><p>Invalid email or password.</p><a href='{FRONTEND_URL}/login.html'>Go Back</a>", 401
             
     except Exception as e:
         error_msg = str(e)
         print(f"✗ Login Error: {error_msg}")
-        return f"<h1>Error</h1><p>Login failed: {error_msg}</p><a href='http://localhost:8000/login.html'>Go Back</a>", 400
+        return f"<h1>Error</h1><p>Login failed: {error_msg}</p><a href='{FRONTEND_URL}/login.html'>Go Back</a>", 400
 
 
 @app.route('/api/user', methods=['GET'])
@@ -229,7 +227,7 @@ def logout():
     """User logout endpoint - clears session"""
     session.clear()
     print("✓ User logged out")
-    return redirect('http://localhost:8000/')
+    return redirect(f'{FRONTEND_URL}/')
 
 
 if __name__ == '__main__':
