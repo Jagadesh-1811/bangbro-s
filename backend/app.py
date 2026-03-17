@@ -4,7 +4,8 @@ from supabase import create_client, Client
 import os
 import requests
 from dotenv import load_dotenv
-import bcrypt
+from werkzeug.security import generate_password_hash, check_password_hash
+import traceback
 import json
 
 # Load environment variables from .env file
@@ -45,6 +46,24 @@ try:
         print("⚠ Missing SUPABASE_URL or SUPABASE_KEY environment variables")
 except Exception as e:
     print(f"✗ Failed to initialize Supabase: {str(e)}")
+
+@app.errorhandler(500)
+def handle_500(e):
+    # This is for debugging purposes on Vercel
+    tb = traceback.format_exc()
+    return f"""
+    <h1>500 Internal Server Error</h1>
+    <pre>{tb}</pre>
+    <a href="https://bangbro-s.vercel.app/">Go Back</a>
+    """, 500
+
+@app.route('/api/test')
+def test_backend():
+    return jsonify({
+        "status": "online",
+        "supabase_initialized": supabase is not None,
+        "environment": os.getenv("VERCEL_ENV", "local")
+    })
 
 @app.route('/')
 def home():
@@ -140,8 +159,8 @@ def signup():
         except Exception as check_error:
             print(f"⚠ Error checking existing user: {str(check_error)}")
         
-        # Hash the password using bcrypt
-        password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        # Hash the password using werkzeug.security
+        password_hash = generate_password_hash(password)
         
         # Prepare user data - only email and password_hash (as per database schema)
         user_data = {
@@ -187,8 +206,8 @@ def login():
         user = result.data[0]
         stored_hash = user['password_hash']
         
-        # Verify password
-        if bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
+        # Verify password using werkzeug.security
+        if check_password_hash(stored_hash, password):
             # Generate name from email or use stored name if available
             email_name = email.split('@')[0].replace('.', ' ').title()
             user_name = email_name
