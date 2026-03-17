@@ -196,7 +196,7 @@
 
             try {
                 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                const backendURL = isLocal ? 'http://localhost:5000' : 'https://bangbro-s-1crh.vercel.app';
+                const backendURL = isLocal ? 'http://localhost:5000' : 'https://bangbro-s-i2g5.vercel.app/';
                 const FRONTEND_URL = isLocal ? 'http://localhost:8000' : 'https://bangbro-s.vercel.app';
                 const response = await fetch(backendURL + '/submitbooking', {
                     method: 'POST',
@@ -233,7 +233,21 @@
             }
         });
      
+        const result = await response.json(); 
 
+if (response.ok) {
+    successDiv.innerHTML = '✓ ' + result.message + ' Redirecting...';
+    successDiv.style.display = 'block';
+    form.reset();
+    setTimeout(() => {
+        window.location.href = FRONTEND_URL + '/';
+    }, 2000);
+} else {
+    errorDiv.innerHTML = '✗ Error: ' + result.message;
+    errorDiv.style.display = 'block';
+    submitButton.disabled = false;
+    submitButton.innerHTML = originalButtonText;
+}   
     </script>
 </body>
 </html>

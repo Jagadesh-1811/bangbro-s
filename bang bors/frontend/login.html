@@ -134,7 +134,7 @@
         <h1 class="main">BANG BRO'S</h1><br><br>
         <h1>LOGIN</h1><br><br>
         <div class="container"></div>
-        <form id="loginForm" action="https://bangbro-s-1crh.vercel.app/login" method="post">
+        <form id="loginForm" action="/login" method="post">
             <div style="text-align: left; max-width: 320px; margin: 0 auto;">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" placeholder="Enter your email" required>
@@ -152,15 +152,34 @@
         </div>
     </div>
     </div>
-    <script>
-        // Backend URL configuration
-        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_URL = isLocal ? 'http://localhost:5000' : 'https://bangbro-s-1crh.vercel.app';
+<script>
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const API_URL = isLocal ? 'http://localhost:5000' : 'https://bangbro-s-i2g5.vercel.app';
 
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            this.action = API_URL + '/login';
-        });
-    </script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        this.action = API_URL + '/login';
+    });
+
+    
+    window.addEventListener('load', function() {
+        const params = new URLSearchParams(window.location.search);
+        const error = params.get('error');
+        const success = params.get('success');
+
+        if (error) {
+            const div = document.createElement('div');
+            div.style.cssText = 'background:#ffe0e0;border:2px solid red;color:red;padding:12px;border-radius:8px;margin-bottom:15px;font-weight:600;';
+            div.textContent = '✗ ' + decodeURIComponent(error);
+            document.getElementById('loginForm').prepend(div);
+        }
+        if (success) {
+            const div = document.createElement('div');
+            div.style.cssText = 'background:#e0ffe0;border:2px solid green;color:green;padding:12px;border-radius:8px;margin-bottom:15px;font-weight:600;';
+            div.textContent = '✓ ' + decodeURIComponent(success);
+            document.getElementById('loginForm').prepend(div);
+        }
+    });
+</script>
 </body>
 
 </html>
