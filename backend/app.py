@@ -99,12 +99,12 @@ def submit_booking():
             except Exception as google_error:
                 print(f"⚠ Google Sheets sync failed: {str(google_error)}")
         
-        return f"<h1>Success!</h1><p>Meeting for {applicant_name}  saved.</p><a href='http://localhost:8000/'>Go Back</a>"
+        return f"<h1>Success!</h1><p>Meeting for {applicant_name}  saved.</p><a href='https://bangbro-s.vercel.app/'>Go Back</a>"
         
     except Exception as e:
         error_msg = str(e)
         print(f"✗ Error: {error_msg}")
-        return f"<h1>Error</h1><p>{error_msg}</p><a href='http://localhost:8000/'>Go Back</a>", 400
+        return f"<h1>Error</h1><p>{error_msg}</p><a href='https://bangbro-s.vercel.app/'>Go Back</a>", 400
 
 
 @app.route('/signup', methods=['POST'])
@@ -118,13 +118,13 @@ def signup():
         
         # Validate input
         if not email or not password or not name:
-            return "<h1>Error</h1><p>Name, email and password are required.</p><a href='http://localhost:8000/signup.html'>Go Back</a>", 400
+            return "<h1>Error</h1><p>Name, email and password are required.</p><a href='https://bangbro-s.vercel.app/signup.html'>Go Back</a>", 400
         
         # Check if user already exists
         try:
             existing_user = supabase.table("users").select("*").eq("email", email).execute()
             if existing_user.data:
-                return "<h1>Error</h1><p>User with this email already exists.</p><a href='http://localhost:8000/signup.html'>Go Back</a>", 400
+                return "<h1>Error</h1><p>User with this email already exists.</p><a href='https://bangbro-s.vercel.app/signup.html'>Go Back</a>", 400
         except Exception as check_error:
             print(f"⚠ Error checking existing user: {str(check_error)}")
         
@@ -144,12 +144,12 @@ def signup():
         # Store name in session for later use (avatar generation)
         session['signup_name'] = name
         
-        return "<h1>Success!</h1><p>Account created successfully! You can now <a href='http://localhost:8000/login.html'>login</a>.</p>", 200
+        return "<h1>Success!</h1><p>Account created successfully! You can now <a href='https://bangbro-s.vercel.app/login.html'>login</a>.</p>", 200
         
     except Exception as e:
         error_msg = str(e)
         print(f"✗ Signup Error: {error_msg}")
-        return f"<h1>Error</h1><p>Signup failed: {error_msg}</p><a href='http://localhost:8000/signup.html'>Go Back</a>", 400
+        return f"<h1>Error</h1><p>Signup failed: {error_msg}</p><a href='https://bangbro-s.vercel.app/signup.html'>Go Back</a>", 400
 
 
 @app.route('/login', methods=['POST'])
@@ -162,13 +162,13 @@ def login():
         
         # Validate input
         if not email or not password:
-            return "<h1>Error</h1><p>Email and password are required.</p><a href='http://localhost:8000/login.html'>Go Back</a>", 400
+            return "<h1>Error</h1><p>Email and password are required.</p><a href='https://bangbro-s.vercel.app/login.html'>Go Back</a>", 400
         
         # Query user from database
         result = supabase.table("users").select("*").eq("email", email).execute()
         
         if not result.data:
-            return "<h1>Error</h1><p>Invalid email or password.</p><a href='http://localhost:8000/login.html'>Go Back</a>", 401
+            return "<h1>Error</h1><p>Invalid email or password.</p><a href='https://bangbro-s.vercel.app/login.html'>Go Back</a>", 401
         
         user = result.data[0]
         stored_hash = user['password_hash']
@@ -191,15 +191,15 @@ def login():
             session['user_avatar'] = avatar_url
             
             print(f"✓ User {email} logged in successfully")
-            return redirect('http://localhost:8000/')
+            return redirect('https://bangbro-s.vercel.app/')
         else:
             print(f"✗ Failed login attempt for {email}")
-            return "<h1>Error</h1><p>Invalid email or password.</p><a href='http://localhost:8000/login.html'>Go Back</a>", 401
+            return "<h1>Error</h1><p>Invalid email or password.</p><a href='https://bangbro-s.vercel.app/login.html'>Go Back</a>", 401
             
     except Exception as e:
         error_msg = str(e)
         print(f"✗ Login Error: {error_msg}")
-        return f"<h1>Error</h1><p>Login failed: {error_msg}</p><a href='http://localhost:8000/login.html'>Go Back</a>", 400
+        return f"<h1>Error</h1><p>Login failed: {error_msg}</p><a href='https://bangbro-s.vercel.app/login.html'>Go Back</a>", 400
 
 
 @app.route('/api/user', methods=['GET'])
@@ -229,7 +229,7 @@ def logout():
     """User logout endpoint - clears session"""
     session.clear()
     print("✓ User logged out")
-    return redirect('http://localhost:8000/')
+    return redirect('https://bangbro-s.vercel.app/')
 
 
 if __name__ == '__main__':
