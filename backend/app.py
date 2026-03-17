@@ -19,9 +19,9 @@ app.secret_key = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# Enable CORS for frontend on port 8000 and Vercel deployments
+# Enable CORS for frontend (production only)
 CORS(app, 
-     resources={r"/*": {"origins": ["http://localhost:8000", "http://127.0.0.1:8000", "https://bangbro-s-ahky.vercel.app", "https://bangbro-s.vercel.app"]}},
+     resources={r"/*": {"origins": ["https://bangbro-s-ahky.vercel.app", "https://bangbro-s.vercel.app"]}},
      supports_credentials=True)
 
 # Supabase Credentials from environment variables

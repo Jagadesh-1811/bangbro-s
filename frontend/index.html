@@ -512,10 +512,13 @@
     </footer>
 
     <script>
+        // Backend URL configuration
+        const API_URL = 'https://bangbro-s-ahky.vercel.app';
+
         // Fetch user data on page load
         async function loadUserProfile() {
             try {
-                const response = await fetch('http://localhost:5000/api/user', {
+                const response = await fetch(API_URL + '/api/user', {
                     credentials: 'include'
                 });
                 const data = await response.json();
@@ -555,7 +558,7 @@
         function logout(e) {
             e.preventDefault();
             if (confirm('Are you sure you want to logout?')) {
-                fetch('http://localhost:5000/logout', {
+                fetch(API_URL + '/logout', {
                     method: 'POST',
                     credentials: 'include'
                 }).then(() => {

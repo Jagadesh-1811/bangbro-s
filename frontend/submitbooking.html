@@ -195,7 +195,8 @@
             submitButton.innerHTML = 'Submitting...';
 
             try {
-                const response = await fetch('http://localhost:5000/submitbooking', {
+                const backendURL = 'https://bangbro-s-ahky.vercel.app';
+                const response = await fetch(backendURL + '/submitbooking', {
                     method: 'POST',
                     body: formData
                 });
@@ -221,7 +222,7 @@
                     submitButton.innerHTML = originalButtonText;
                 }
             } catch (error) {
-                errorDiv.innerHTML = '✗ Connection Error: Make sure backend is running on localhost:5000';
+                errorDiv.innerHTML = '✗ Connection Error: Make sure backend is running';
                 errorDiv.style.display = 'block';
                 console.error('Error:', error);
                 // Re-enable button on error
