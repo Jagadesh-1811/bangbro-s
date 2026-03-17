@@ -36,7 +36,15 @@ else:
     GOOGLE_SCRIPT_URL = GOOGLE_SCRIPT_ID or "YOUR_GOOGLE_WEB_APP_URL_HERE"
 
 # Initialize Supabase client
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase = None
+try:
+    if SUPABASE_URL and SUPABASE_KEY:
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        print("✓ Supabase client initialized")
+    else:
+        print("⚠ Missing SUPABASE_URL or SUPABASE_KEY environment variables")
+except Exception as e:
+    print(f"✗ Failed to initialize Supabase: {str(e)}")
 
 @app.route('/')
 def home():
@@ -51,6 +59,8 @@ def home():
 
 @app.route('/submitbooking', methods=['POST'])
 def submit_booking():
+    if not supabase:
+        return "<h1>Error</h1><p>Database connection not initialized.</p>", 500
     try:
         # Get form data
         company = request.form.get('company')
@@ -109,6 +119,8 @@ def submit_booking():
 
 @app.route('/signup', methods=['POST'])
 def signup():
+    if not supabase:
+        return "<h1>Error</h1><p>Database connection not initialized.</p>", 500
     """User signup endpoint - stores user credentials in database"""
     try:
         # Get form data
@@ -154,6 +166,8 @@ def signup():
 
 @app.route('/login', methods=['POST'])
 def login():
+    if not supabase:
+        return "<h1>Error</h1><p>Database connection not initialized.</p>", 500
     """User login endpoint - authenticates user credentials and stores in session"""
     try:
         # Get form data
