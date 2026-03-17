@@ -21,6 +21,7 @@ CORS(app,
      resources={r"/*": {"origins": [
          "http://localhost:8000", 
          "http://127.0.0.1:8000", 
+         "https://bangbro-s-i2g5.vercel.app",
          "https://bangbro-s.vercel.app"
      ]}},
      supports_credentials=True)

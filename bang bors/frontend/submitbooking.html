@@ -134,7 +134,7 @@
         <h1 class="main">BANG BRO'S</h1><br><br>
         <h1>SIGNUP</h1><br><br>
         <div class="container"></div>
-        <form id="signupForm" action="https://bangbro-s-1crh.vercel.app/signup" method="post">
+        <form id="signupForm" method="post">
             <div style="text-align: left; max-width: 320px; margin: 0 auto;">
                 <label for="name">Full Name</label>
                 <input type="text" id="name" name="name" placeholder="Enter your full name" required>
@@ -157,9 +157,13 @@
 <script>
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const API_URL = isLocal ? 'http://localhost:5000' : 'https://bangbro-s-i2g5.vercel.app';
+    
+    // Set form action dynamically
+    document.getElementById('signupForm').action = API_URL + '/signup';
+    console.log('Booking form action set to:', API_URL + '/signup');
 
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        this.action = API_URL + '/login';
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+        this.action = API_URL + '/signup';
     });
 
     window.addEventListener('load', function() {
@@ -171,7 +175,7 @@
             const div = document.createElement('div');
             div.style.cssText = 'background:#ffe0e0;border:2px solid red;color:red;padding:12px;border-radius:8px;margin-bottom:15px;font-weight:600;';
             div.textContent = '✗ ' + decodeURIComponent(error);
-            document.getElementById('loginForm').prepend(div);
+            document.getElementById('signupForm').prepend(div);
         }
         if (success) {
             const div = document.createElement('div');
