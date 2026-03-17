@@ -13,7 +13,7 @@ app = Flask(__name__,
             template_folder='../frontend', 
             static_folder='../frontend')
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "https://bangbro-s.vercel.app")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000")
 
 app.secret_key = os.getenv("SECRET_KEY", "bangbros-secret-key-change-in-prod")
 
