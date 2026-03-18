@@ -164,26 +164,28 @@ bang bors/
 ### Users Table
 ```sql
 CREATE TABLE users (
-  id BIGINT PRIMARY KEY,
-  email VARCHAR UNIQUE NOT NULL,
-  password_hash VARCHAR NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
 );
 ```
 
 ### Recruiter Bookings Table
 ```sql
-CREATE TABLE recruiter_bookings (
-  id BIGINT PRIMARY KEY,
-  company_name VARCHAR,
-  applicant_name VARCHAR,
-  gmail VARCHAR,
-  meeting_type VARCHAR,
-  start_time TIMESTAMP,
-  meeting_link VARCHAR,
-  notes TEXT,
-  created_at TIMESTAMP DEFAULT NOW()
-);
+create table recruiter_bookings (
+  id uuid default gen_random_uuid() primary key,
+  applicant_name text not null,       -- The person being interviewed
+  company_name text not null,         -- The hiring company
+  recruiter_name text not null,       -- The recruiter handling it
+  meeting_type text not null,         -- e.g., Technical, HR, Screening
+  gmail text,
+  start_time timestamp with time zone not null,
+  meeting_link text,                  -- Zoom/Meet URL
+  notes text,                         -- Extra details
+  created_at timestamp with time zone default now()
+)
 ```
 
 ---
