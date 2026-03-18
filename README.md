@@ -176,14 +176,13 @@ CREATE TABLE users (
 ```sql
 create table recruiter_bookings (
   id uuid default gen_random_uuid() primary key,
-  applicant_name text not null,       -- The person being interviewed
-  company_name text not null,         -- The hiring company
-  recruiter_name text not null,       -- The recruiter handling it
-  meeting_type text not null,         -- e.g., Technical, HR, Screening
+  applicant_name text not null,       
+  company_name text not null,                
+  meeting_type text not null,        
   gmail text,
   start_time timestamp with time zone not null,
-  meeting_link text,                  -- Zoom/Meet URL
-  notes text,                         -- Extra details
+  meeting_link text,                  
+  notes text,                         
   created_at timestamp with time zone default now()
 )
 ```
