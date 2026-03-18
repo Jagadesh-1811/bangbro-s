@@ -62,6 +62,7 @@
 - **Supabase**: Real-time database for user accounts and booking records
 - **Google Sheets API**: Automatic logging of all recruitments for analytics
 - **Cross-platform**: Works seamlessly across local, staging, and production environments
+- **make. com **: It is an automation website where we integrate an automation for Gmail for the applicants 
 
 ###  User Experience
 - Glassmorphism design with modern aesthetics
